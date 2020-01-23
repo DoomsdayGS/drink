@@ -2,15 +2,17 @@
 
 void serviceMode() {
   if (!digitalRead(BTN_PIN)) {
-    byte serviceText[] = {_S, _E, _r, _U, _i, _C, _E};
-    disp.runningString(serviceText, sizeof(serviceText), 150);
+    //byte serviceText[] = {_S, _E, _r, _U, _i, _C, _E}; //OLED
+    //disp.runningString(serviceText, sizeof(serviceText), 150); //OLED
     while (!digitalRead(BTN_PIN));  // ждём отпускания
     delay(200);
     servoON();
     int servoPos = 0;
     long pumpTime = 0;
     timerMinim timer100(100);
-    disp.displayInt(0);
+    //disp.displayInt(0); //OLED
+	srvMode=true;
+    DisplayRedraw ("Крути/Жми РУЧКУ",0,20);
     bool flag;
     for (;;) {
       servo.tick();
@@ -21,7 +23,7 @@ void serviceMode() {
         if (!digitalRead(ENC_SW)) {
           if (flag) pumpTime += 100;
           else pumpTime = 0;
-          disp.displayInt(pumpTime);
+          DisplayRedraw (String("Помпа,время: " +String(pumpTime)),0,23); //disp.displayInt(pumpTime); //OLED
           pumpON();
           flag = true;
         } else {
@@ -50,29 +52,32 @@ void serviceMode() {
           servoPos -= 5;
         }
         servoPos = constrain(servoPos, 0, 180);
-        disp.displayInt(servoPos);
+        DisplayRedraw (String("Серво,угол: " +String(servoPos)),0,23); //disp.displayInt(servoPos); //OLED
         servo.setTargetDeg(servoPos);
       }
 
       if (btn.holded()) {
         servo.setTargetDeg(0);
+		srvMode=false;
         break;
       }
     }
   }
-  disp.clear();
+  //disp.clear(); //OLED
   while (!servo.tick());
   servoOFF();
 }
 
 // выводим объём и режим
 void dispMode() {
+/* //OLED	
   disp.displayInt(thisVolume);
   if (workMode) disp.displayByte(0, _A);
   else {
 	disp.displayByte(0, _P);
 	pumpOFF();
-  }
+  } //OLED*/
+    DisplayRedraw (String(thisVolume)+" мл.",40,20); //OLED
 }
 
 // наливайка, опрос кнопок
@@ -86,6 +91,8 @@ void flowTick() {
         LEDchanged = true;
         DEBUG("set glass");
         DEBUG(i);
+		dispMode(); //OLED
+        displayNoGlass = false; //OLED
       }
       if (digitalRead(SW_pins[i]) && shotStates[i] != NO_GLASS) {   // убрали пустую/полную рюмку
         shotStates[i] = NO_GLASS;                                   // статус - нет рюмки
@@ -97,6 +104,7 @@ void flowTick() {
           systemState = WAIT;                                         // режим работы - ждать
           WAITtimer.reset();
           pumpOFF();                                                  // помпу выкл
+		  displayNoGlass = false; //OLED
         }
         DEBUG("take glass");
         DEBUG(i);
@@ -108,6 +116,7 @@ void flowTick() {
     } else {                // ручной
       if (btn.clicked()) {  // клик!
         systemON = true;    // система активирована
+		displayNoGlass=true; //OLED
         timeoutReset();     // таймаут сброшен
       }
       if (systemON) flowRoutnie();  // если активны - ищем рюмки и всё такое
@@ -130,6 +139,7 @@ void flowRoutnie() {
         servo.attach();
         servo.setTargetDeg(shotPos[curPumping]);          // задаём цель
         DEBUG("find glass");
+		displayNoGlass = false; //OLED
         DEBUG(curPumping);
         break;
       }
@@ -138,6 +148,8 @@ void flowRoutnie() {
       servoON();
       servo.setTargetDeg(0);                              // цель серво - 0
       if (servo.tick()) {                                 // едем до упора
+	  if (displayNoGlass) if (systemON) DisplayRedraw("ПОСТАВЬТЕ РЮМКУ",0,20); //OLED
+	  displayNoGlass = false; //OLED
         servoOFF();                                       // выключили серво
         systemON = false;                                 // выключили систему
         DEBUG("no glass");
@@ -185,7 +197,7 @@ void LEDtick() {
 
 // сброс таймаута
 void timeoutReset() {
-  if (!timeoutState) disp.brightness(7);
+  if (!timeoutState) //disp.brightness(7); //OLED
   timeoutState = true;
   TIMEOUTtimer.reset();
   TIMEOUTtimer.start();
@@ -197,7 +209,7 @@ void timeoutTick() {
   if (timeoutState && TIMEOUTtimer.isReady()) {
     DEBUG("timeout");
     timeoutState = false;
-    disp.brightness(1);
+    //disp.brightness(1); //OLED
     POWEROFFtimer.reset();
     jerkServo();
     if (volumeChanged) {
@@ -218,13 +230,13 @@ void timeoutTick() {
 
 void jerkServo() {
   if (KEEP_POWER) {
-    disp.brightness(7);
+    //disp.brightness(7); //OLED
     servoON();
     servo.attach();
     servo.write(random(0, 4));
     delay(200);
     servo.detach();
     servoOFF();
-    disp.brightness(1);
+    //disp.brightness(1); //OLED
   }
 }

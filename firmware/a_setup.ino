@@ -23,10 +23,20 @@ void setup() {
     pinMode(SW_pins[i], INPUT_PULLUP);
   }
 
+//->OLED
   // старт дисплея
-  disp.clear();
-  disp.brightness(7);
-  DEBUG("disp init");
+  //disp.clear();
+  //disp.brightness(7);
+  //DEBUG("disp init");
+    // старт дисплея
+  u8g2.begin();
+  u8g2.enableUTF8Print();    // enable UTF8 support for the Arduino print() function
+  u8g2.setFont(u8g2_font_unifont_t_cyrillic);  // крупный
+  u8g2.clearBuffer();
+  u8g2.setCursor(30, 20);
+  u8g2.print("Наливатор");   
+  u8g2.sendBuffer();
+  //<-OLED
 
   // настройка серво
   servoON();

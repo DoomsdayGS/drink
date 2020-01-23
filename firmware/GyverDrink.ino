@@ -13,15 +13,16 @@
 
 // ======== НАСТРОЙКИ ========
 #define NUM_SHOTS 4       // количество рюмок (оно же кол-во светодиодов и кнопок!)
+#define MAXVOLUME 200     // максимум для налива (объём стакана = 200 мл)  OLED
 #define TIMEOUT_OFF 5     // таймаут на выключение (перестаёт дёргать привод), минут
 
 // положение серво над центрами рюмок
-const byte shotPos[] = {25, 60, 95, 145, 60, 60};
+const byte shotPos[] = {180, 135, 90, 45, 0}; //{25, 60, 95, 145, 60, 60};
 
 // время заполнения 50 мл
 const long time50ml = 5500;
 
-#define KEEP_POWER 1    // 1 - система поддержания питания ПБ, чтобы он не спал
+#define KEEP_POWER 0    // 1 - система поддержания питания ПБ, чтобы он не спал
 
 // отладка
 #define DEBUG_UART 0
@@ -35,12 +36,13 @@ const long time50ml = 5500;
 #define ENC_SW 8
 #define ENC_DT 9
 #define ENC_CLK 10
-#define DISP_DIO 11
-#define DISP_CLK 12
-const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
+//#define DISP_DIO 11 //OLED
+//#define DISP_CLK 12 //OLED
+const byte SW_pins[] = {A0, A1, A2, A3, A6}; //OLED
 
 // =========== ЛИБЫ ===========
-#include <GyverTM1637.h>
+//#include <GyverTM1637.h> //OLED
+#include <U8g2lib.h> // Дисплей подключаем по 2 проводам, на Arduino Uno (A4 = SDA) и (A5 = SCL). //OLED
 #include <ServoSmooth.h>
 #include <microLED.h>
 #include <EEPROM.h>
@@ -53,10 +55,15 @@ const byte SW_pins[] = {A0, A1, A2, A3, A4, A5};
 LEDdata leds[NUM_SHOTS];  // буфер ленты типа LEDdata (размер зависит от COLOR_DEBTH)
 microLED strip(leds, NUM_SHOTS, LED_PIN);  // объект лента
 
-GyverTM1637 disp(DISP_CLK, DISP_DIO);
+//OLED ->
+//GyverTM1637 disp(DISP_CLK, DISP_DIO);
+// Дисплей подключаем по 2 проводам, на Arduino Uno (A4 = SDA) и (A5 = SCL).
+//дисплей мой (другие типы взять из примеров u8g2
+U8G2_SSD1306_128X32_UNIVISION_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE, /* clock=*/ SCL, /* data=*/ SDA);   // pin remapping with ESP8266 HW I2C
+//<-OLED
 
 // пин clk, пин dt, пин sw, направление (0/1), тип (0/1)
-encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 1);
+encMinim enc(ENC_CLK, ENC_DT, ENC_SW, 1, 0); //OLED
 
 ServoSmooth servo;
 
@@ -80,6 +87,9 @@ int thisVolume = 50;
 bool systemON = false;
 bool timeoutState = false;
 bool volumeChanged = false;
+
+bool srvMode = false;        //переменная для хранения режима работы (ручной/автоматический) //OLED
+bool displayNoGlass = false; //переменная для однократного вывода надписи "нет рюмки" //OLED
 
 // =========== МАКРО ===========
 #define servoON() digitalWrite(SERVO_POWER, 1)
