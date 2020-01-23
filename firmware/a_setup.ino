@@ -1,11 +1,20 @@
 void setup() {
 #if (DEBUG_UART == 1)
-  uart.begin();
+  Serial.begin(9600);
+  DEBUG("start");
 #endif
+  // епром
+  if (EEPROM.read(1000) != 10) {
+    EEPROM.write(1000, 10);
+    EEPROM.put(0, thisVolume);
+  }
+  EEPROM.get(0, thisVolume);
+  
   // тыкаем ленту
   strip.setBrightness(130);
   strip.clear();
   strip.show();
+  DEBUG("strip init");
 
   // настройка пинов
   pinMode(PUMP_POWER, 1);
@@ -17,6 +26,7 @@ void setup() {
   // старт дисплея
   disp.clear();
   disp.brightness(7);
+  DEBUG("disp init");
 
   // настройка серво
   servoON();
@@ -31,4 +41,5 @@ void setup() {
   serviceMode();    // калибровка
   dispMode();       // выводим на дисплей стандартные значения
   timeoutReset();   // сброс таймаута
+  TIMEOUTtimer.start();  
 }
