@@ -9,6 +9,7 @@ void encTick() {
     }
     if (enc.isRight()) {
       thisVolume -= 5;
+	  constrain(thisVolume, 5, 1000);
     }
     dispMode();
   }

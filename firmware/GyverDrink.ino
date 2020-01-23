@@ -19,7 +19,7 @@
 const byte shotPos[] = {25, 60, 95, 145, 60, 60};
 
 // время заполнения 50 мл
-const int time50ml = 5500;
+const long time50ml = 5500;
 
 #define KEEP_POWER 1    // 1 - система поддержания питания ПБ, чтобы он не спал
 

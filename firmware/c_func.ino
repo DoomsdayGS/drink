@@ -69,7 +69,10 @@ void serviceMode() {
 void dispMode() {
   disp.displayInt(thisVolume);
   if (workMode) disp.displayByte(0, _A);
-  else disp.displayByte(0, _P);
+  else {
+	  disp.displayByte(0, _P);
+	  pumpOFF();
+  }
 }
 
 // наливайка, опрос кнопок
@@ -90,10 +93,12 @@ void flowTick() {
         LEDchanged = true;
         timeoutReset();                                             // сброс таймаута
         if (systemState == PUMPING) {                               // убрали во время заправки!
-          systemState = WAIT;                                         // режим работы - ждать
-          WAITtimer.reset();
-          pumpOFF();                                                  // помпу выкл
-          if (i == curPumping) curPumping = -1;                       // снимаем выбор рюмки
+          if (i == curPumping) {
+            curPumping = -1; // снимаем выбор рюмки
+            systemState = WAIT;                                         // режим работы - ждать
+            WAITtimer.reset();
+            pumpOFF();                                                  // помпу выкл
+          }
         }
         DEBUG("take glass");
         DEBUG(i);
@@ -137,12 +142,13 @@ void flowRoutnie() {
         servoOFF();                                       // выключили серво
         systemON = false;                                 // выключили систему
         DEBUG("no glass");
+		TIMEOUTtimer.start();
       }
     }
   } else if (systemState == MOVING) {                     // движение к рюмке
     if (servo.tick()) {                                   // если приехали
       systemState = PUMPING;                              // режим - наливание
-      FLOWtimer.setInterval(thisVolume * time50ml / 50);  // перенастроили таймер
+      FLOWtimer.setInterval((long)thisVolume * time50ml / 50);  // перенастроили таймер
       FLOWtimer.reset();                                  // сброс таймера
       pumpON();                                           // НАЛИВАЙ!
       strip.setLED(curPumping, mCOLOR(YELLOW));           // зажгли цвет
@@ -182,7 +188,7 @@ void LEDtick() {
 void timeoutReset() {
   if (!timeoutState) disp.brightness(7);
   timeoutState = true;
-  TIMEOUTtimer.reset();
+  TIMEOUTtimer.stop();
 }
 
 // сам таймаут
