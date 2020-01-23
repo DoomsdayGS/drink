@@ -92,13 +92,11 @@ void flowTick() {
         strip.setLED(i, mCOLOR(BLACK));                             // нигра
         LEDchanged = true;
         timeoutReset();                                             // сброс таймаута
-        if (systemState == PUMPING) {                               // убрали во время заправки!
-          if (i == curPumping) {
-            curPumping = -1; // снимаем выбор рюмки
-            systemState = WAIT;                                         // режим работы - ждать
-            WAITtimer.reset();
-            pumpOFF();                                                  // помпу выкл
-          }
+        if (i == curPumping) {
+          curPumping = -1; // снимаем выбор рюмки
+          systemState = WAIT;                                         // режим работы - ждать
+          WAITtimer.reset();
+          pumpOFF();                                                  // помпу выкл
         }
         DEBUG("take glass");
         DEBUG(i);
