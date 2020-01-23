@@ -11,7 +11,8 @@ void setup() {
   EEPROM.get(0, thisVolume);
   
   // тыкаем ленту
-  strip.setBrightness(130);
+  FastLED.setBrightness(255);
+  strip.setBrightness(255);
   strip.clear();
   strip.show();
   DEBUG("strip init");

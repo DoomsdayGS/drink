@@ -12,9 +12,12 @@
 */
 
 // ======== НАСТРОЙКИ ========
-#define NUM_SHOTS 4       // количество рюмок (оно же кол-во светодиодов и кнопок!)
+#define NUM_SHOTS 5       // количество рюмок (оно же кол-во светодиодов и кнопок!)
+#define NUM_LEDS 13  // кол-во диодов //OLED
 #define MAXVOLUME 200     // максимум для налива (объём стакана = 200 мл)  OLED
 #define TIMEOUT_OFF 5     // таймаут на выключение (перестаёт дёргать привод), минут
+
+int initLED = 5; //OLED начальный светодиод маяка
 
 // положение серво над центрами рюмок
 const byte shotPos[] = {180, 135, 90, 45, 0}; //{25, 60, 95, 145, 60, 60};
@@ -51,9 +54,11 @@ const byte SW_pins[] = {A0, A1, A2, A3, A6}; //OLED
 #include "timer2Minim.h"
 
 // =========== ДАТА ===========
-#define COLOR_DEBTH 2   // цветовая глубина: 1, 2, 3 (в байтах)
-LEDdata leds[NUM_SHOTS];  // буфер ленты типа LEDdata (размер зависит от COLOR_DEBTH)
-microLED strip(leds, NUM_SHOTS, LED_PIN);  // объект лента
+#define REPLACE_FASTLED //OLED
+#define COLOR_DEBTH 3   // цветовая глубина: 1, 2, 3 (в байтах)
+LEDdata leds[NUM_LEDS];  // буфер ленты типа LEDdata (размер зависит от COLOR_DEBTH)
+microLED strip(leds, NUM_LEDS, LED_PIN);  // объект лента
+#define FastLED strip   //OLED
 
 //OLED ->
 //GyverTM1637 disp(DISP_CLK, DISP_DIO);
@@ -78,7 +83,7 @@ timerMinim POWEROFFtimer(TIMEOUT_OFF * 60000L);
 
 bool LEDchanged = false;
 bool pumping = false;
-int8_t curPumping = -1;
+int8_t curPumping = -1; //Выбор рюмки
 
 enum {NO_GLASS, EMPTY, IN_PROCESS, READY} shotStates[NUM_SHOTS];
 enum {SEARCH, MOVING, WAIT, PUMPING} systemState;

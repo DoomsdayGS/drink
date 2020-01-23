@@ -38,6 +38,7 @@ void serviceMode() {
           } else {
             strip.setLED(i, mCOLOR(BLACK));
           }
+		  mayak();
           strip.show();
         }
       }
@@ -238,5 +239,154 @@ void jerkServo() {
     servo.detach();
     servoOFF();
     //disp.brightness(1); //OLED
+  }
+}
+
+void mayak(){
+          int led0, led1, led2, led3, led4, led5, led6, led7;
+          int satuR = 0;
+
+          int coloR = 0;
+          leds[initLED] = CHSV(0, 255, 127);
+          leds[initLED + 1] = CHSV(0, 255, 255);
+          leds[initLED + 2] = CHSV(0, 255, 128);
+          LEDS.show();
+          delay(100);
+          
+          for(int i=0;i<200;i++){
+          leds[initLED] = CHSV(0, 255-i, 27+i/2);
+          leds[initLED + 1] = CHSV(0, 255-i, 55+i);
+          leds[initLED + 2] = CHSV(0, 255-i, 27+i/2);
+          LEDS.show();
+          delay(10);
+          }
+
+      for (int k = 0; k <3;k++){
+            for (int i = 1; i<1019; i++){
+              if (i == 1){
+                led0 = 127;
+                led1 = 255;
+                led2 = 128;
+                led3 = 0;
+                led4 = 0;
+                led5 = 0;
+                led6 = 0;
+                led7 = 0;
+              }
+      
+                if (i >1 and i<129){
+                  --led0;
+                  --led1;
+                  ++led2;
+                  ++led3;
+                  led4 = 0;
+                  led5 = 0;
+                  led6 = 0;
+                  led7 = 0;
+                }
+                
+                if (i >= 129 and i < 257){
+                  --led1;
+                  --led2;
+                  ++led3;
+                  ++led4;
+                  led0 = 0;
+                  led5 = 0;
+                  led6 = 0;
+                  led7 = 0;
+                }
+                
+                if (i >= 257 and i < 384){
+                  --led2;
+                  --led3;
+                  ++led4;
+                  ++led5;
+                  led0 = 0;
+                  led1 = 0;
+                  led6 = 0;
+                  led7 = 0;
+                }
+                
+                if (i >= 384 and i < 511){
+                  --led3;
+                  --led4;
+                  ++led5;
+                  ++led6;
+                  led0 = 0;
+                  led1 = 0;
+                  led2 = 0;
+                  led7 = 0;
+                }
+                
+                if (i >= 511 and i < 639){
+                  --led4;
+                  --led5;
+                  ++led6;
+                  ++led7;
+                  led0 = 0;
+                  led1 = 0;
+                  led2 = 0;
+                  led3 = 0;
+                } 
+                
+                if (i >= 639 and i < 765){
+                  --led5;
+                  --led6;
+                  ++led7;
+                  ++led0;
+                  led1 = 0;
+                  led2 = 0;
+                  led3 = 0;
+                  led4 = 0;
+                } 
+                if (i >= 765 and i < 893){
+                  --led6;
+                  --led7;
+                  ++led0;
+                  ++led1;
+                  led2 = 0;
+                  led3 = 0;
+                  led4 = 0;
+                  led5 = 0;
+                } 
+                
+                if (i >= 893 and i < 1019){
+                  --led7;
+                  --led0;
+                  ++led1;
+                  ++led2;
+                  led3 = 0;
+                  led4 = 0;
+                  led5 = 0;
+                  led6 = 0;
+                }
+                
+                leds[initLED] = CHSV(coloR, satuR, led0);
+                leds[initLED + 1] = CHSV(coloR, satuR, led1);
+                leds[initLED + 2] = CHSV(coloR, satuR, led2);
+                leds[initLED + 3] = CHSV(coloR, satuR, led3);
+                leds[initLED + 4] = CHSV(coloR, satuR, led4);
+                leds[initLED + 5] = CHSV(coloR, satuR, led5);
+                leds[initLED + 6] = CHSV(coloR, satuR, led6);
+                leds[initLED + 7] = CHSV(coloR, satuR, led7);
+                LEDS.show();
+            }
+        }
+         for(int i=0;i<255;i++){
+          leds[initLED] = CHSV(0, 255, 127-i/2);
+          leds[initLED + 1] = CHSV(0, 255, 255-i);
+          leds[initLED + 2] = CHSV(0, 255, 127-i/2);
+          delay(10);
+          LEDS.show();
+          }
+          one_color_all(0, 0, 0);          // погасить все светодиоды
+          LEDS.show();                     // отослать команду
+          delay(2000);
+
+}
+
+void one_color_all(int cred, int cgrn, int cblu) {       //-SET ALL LEDS TO ONE COLOR
+  for (int i = initLED ; i < LED_COUNT; i++ ) {
+    leds[i].setRGB( cred, cgrn, cblu);
   }
 }
